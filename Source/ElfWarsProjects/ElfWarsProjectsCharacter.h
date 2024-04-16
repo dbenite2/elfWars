@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "ElfWarsProjectsCharacter.generated.h"
 
+class UCSkillSelection;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -55,6 +56,9 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	UPROPERTY(EditAnywhere, Blueprintable, Category="Skill Selector")
+	TArray<int32> AvailableSkills;
 			
 
 protected:
@@ -69,5 +73,11 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	UFUNCTION(CallInEditor, BlueprintCallable)
+	void SetSkills(const int& SkillIndex);
+
+	UFUNCTION(CallInEditor, BlueprintCallable)
+	TArray<int32> GetSkillList();
 };
 
