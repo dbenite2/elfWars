@@ -84,8 +84,11 @@ void AElfWarsProjectsCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	int PlayerIndex = 0;
+	if (PlayerController)
 	{
+		PlayerIndex = PlayerController->GetLocalPlayer()->GetLocalPlayerIndex();
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
@@ -101,7 +104,7 @@ void AElfWarsProjectsCharacter::BeginPlay()
 		// get the skills from the GameManager
 		UGameManager* GameManager = Cast<UGameManager>(UGameplayStatics::GetGameInstance(this));
 		if (GameManager != nullptr) {
-			AvailableSkills = GameManager->GetSkillSet(0);
+			AvailableSkills = GameManager->GetSkillSet(PlayerIndex);
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Character is in the target level."));
 	} 
@@ -160,12 +163,12 @@ void AElfWarsProjectsCharacter::Move(const FInputActionValue& Value)
 void AElfWarsProjectsCharacter::Look(const FInputActionValue& Value)
 {
 	// // input is a Vector2D
-	// FVector2D LookAxisVector = Value.Get<FVector2D>();
-	//
-	// if (Controller != nullptr)
-	// {
-	// 	// add yaw and pitch input to controller
-	// 	AddControllerYawInput(LookAxisVector.X);
-	// 	AddControllerPitchInput(LookAxisVector.Y);
-	// }
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	
+	if (Controller != nullptr)
+	{
+		// add yaw and pitch input to controller
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
 }

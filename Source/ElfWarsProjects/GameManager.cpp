@@ -4,6 +4,7 @@
 #include "GameManager.h"
 
 TArray<int32> UGameManager::GetSkillSet(const int& PlayerIndex) {
+	UE_LOG(LogTemp, Log, TEXT("PlayerIndex: %d"), PlayerIndex);
 	return PlayerIndex == 0 ? SkillSetP1 : SkillSetP2;
 }
 
@@ -47,8 +48,8 @@ void UGameManager::SetSkillSet(const int PlayerIndex, const int SkillIndex) {
 	
 }
 
-bool UGameManager::GetSelectionLock() {
-	return bSelectionLockP1 && bSelectionLockP2;
+bool UGameManager::GetSelectionLock(const int PlayerIndex) {
+	return PlayerIndex == 0 ? bSelectionLockP1 : bSelectionLockP2;
 }
 
 

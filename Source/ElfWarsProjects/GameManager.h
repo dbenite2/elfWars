@@ -22,7 +22,7 @@ public:
 	TArray<int32> GetSkillSet(const int& PlayerIndex);
 	
 	UFUNCTION(CallInEditor, BlueprintCallable)
-	bool GetSelectionLock();
+	bool GetSelectionLock(const int PlayerIndex);
 
 private:
 	UPROPERTY(EditAnywhere, Blueprintable, Category="Skills")
