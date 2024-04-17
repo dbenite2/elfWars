@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "ElfWarsProjectsCharacter.generated.h"
 
+class UCSkillSelection;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -46,6 +47,8 @@ class AElfWarsProjectsCharacter : public ACharacter
 
 public:
 	AElfWarsProjectsCharacter();
+
+	virtual void Tick(float DeltaSeconds) override;
 	
 
 protected:
@@ -55,6 +58,9 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	UPROPERTY(EditAnywhere, Blueprintable, Category="Skill Selector")
+	TArray<int32> AvailableSkills;
 			
 
 protected:
