@@ -10,7 +10,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "CSkillSelection.h"
+#include "GameManager.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -19,6 +20,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AElfWarsProjectsCharacter::AElfWarsProjectsCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 		
@@ -55,6 +57,27 @@ AElfWarsProjectsCharacter::AElfWarsProjectsCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
+void AElfWarsProjectsCharacter::Tick(float DeltaSeconds) {
+	Super::Tick(DeltaSeconds);
+
+	if (AvailableSkills.Contains(1)) {
+		Jump();
+	}
+	if (AvailableSkills.Contains(2)) {
+		Move(100);
+	}
+	if (AvailableSkills.Contains(3)) {
+		Move(-200);
+	}
+	if (AvailableSkills.Contains(4)) {
+		Jump();
+	}
+	if (AvailableSkills.Contains(5)) {
+		Jump();
+	}
+}
+
+
 void AElfWarsProjectsCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -69,23 +92,22 @@ void AElfWarsProjectsCharacter::BeginPlay()
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("log text: %d"), AvailableSkills.Num());
+	// Get the current level of the character
+	FString CurrentLevelName = GetWorld()->GetMapName();
+	CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
 
-	if (AvailableSkills.Contains(1)) {
-		Jump();
-	}
-	if (AvailableSkills.Contains(2)) {
-		Move(10);
-	}
-	if (AvailableSkills.Contains(3)) {
-		Move(-10);
-	}
-	if (AvailableSkills.Contains(4)) {
-		Jump();
-	}
-	if (AvailableSkills.Contains(5)) {
-		Jump();
-	}
+	// Check if the current level name matches the target level name
+	if(CurrentLevelName != FName(TEXT("SkillSelectionLevel"))) {
+		// get the skills from the GameManager
+		UGameManager* GameManager = Cast<UGameManager>(UGameplayStatics::GetGameInstance(this));
+		if (GameManager != nullptr) {
+			AvailableSkills = GameManager->GetSkillSet(0);
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Character is in the target level."));
+	} 
+	
+	
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -147,16 +169,3 @@ void AElfWarsProjectsCharacter::Look(const FInputActionValue& Value)
 	// 	AddControllerPitchInput(LookAxisVector.Y);
 	// }
 }
-
-void AElfWarsProjectsCharacter::SetSkills(const int& SkillIndex) {
-	if (AvailableSkills.Num() < 4) {
-		AvailableSkills.Push(SkillIndex);
-	}
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Skill list"), SkillList.Num());
-	UE_LOG(LogTemp, Log, TEXT("log text: %d"), AvailableSkills.Num());
-}
-
-TArray<int32> AElfWarsProjectsCharacter::GetSkillList() {
-	return AvailableSkills;
-}
-

@@ -47,6 +47,8 @@ class AElfWarsProjectsCharacter : public ACharacter
 
 public:
 	AElfWarsProjectsCharacter();
+
+	virtual void Tick(float DeltaSeconds) override;
 	
 
 protected:
@@ -73,11 +75,5 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
-	UFUNCTION(CallInEditor, BlueprintCallable)
-	void SetSkills(const int& SkillIndex);
-
-	UFUNCTION(CallInEditor, BlueprintCallable)
-	TArray<int32> GetSkillList();
 };
 
