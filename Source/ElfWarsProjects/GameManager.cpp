@@ -3,16 +3,16 @@
 
 #include "GameManager.h"
 
-TArray<int32> UGameManager::GetSkillSet(const int& PlayerIndex) {
+TArray<FSkillStruct> UGameManager::GetSkillSet(const int& PlayerIndex) {
 	UE_LOG(LogTemp, Log, TEXT("PlayerIndex: %d"), PlayerIndex);
 	return PlayerIndex == 0 ? SkillSetP1 : SkillSetP2;
 }
 
-void UGameManager::SetSkillSet(const int PlayerIndex, const int SkillIndex) {
-	UE_LOG(LogTemp, Log, TEXT("Player Index: %d, Skill Index: %d"), PlayerIndex, SkillIndex);
+void UGameManager::SetSkillSet(const int PlayerIndex, const FSkillStruct Skill) {
+	UE_LOG(LogTemp, Log, TEXT("Player Index: %d, Skill Index: %s"), PlayerIndex, Skill.Name);
 
 	// Pointer to the current player's skill set
-	TArray<int32>* SkillSetPtr = nullptr;
+	TArray<FSkillStruct>* SkillSetPtr = nullptr;
 	
 	// Boolean to track if the selection should be locked
 	bool* bSelectionLockPtr = nullptr;
@@ -36,7 +36,7 @@ void UGameManager::SetSkillSet(const int PlayerIndex, const int SkillIndex) {
 			SkillSetPtr->Empty();
 			*bSelectionLockPtr = false; // Reset selection lock when starting over
 		}
-		SkillSetPtr->Add(SkillIndex);
+		SkillSetPtr->Add(Skill);
 
 		if (SkillSetPtr->Num() == 4) {
 			*bSelectionLockPtr = true; // Lock the selection when 4 skills are added

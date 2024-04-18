@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "ElfWarsProjectsCharacter.generated.h"
 
+struct FSkillStruct;
 class UCSkillSelection;
 class USpringArmComponent;
 class UCameraComponent;
@@ -45,11 +47,28 @@ class AElfWarsProjectsCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ExecuteSkill01;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ExecuteSkill02;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ExecuteSkill03;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ExecuteSkill04;
+
 public:
 	AElfWarsProjectsCharacter();
 
 	virtual void Tick(float DeltaSeconds) override;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Type")
+	FString Type;
+
+	UFUNCTION(CallInEditor, Blueprintable)
+	void Hit(FSkillStruct& Skill);
 
 protected:
 
@@ -59,8 +78,16 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
+	void Skill01();
+
+	void Skill02();
+
+	void Skill03();
+
+	void Skill04();
+
 	UPROPERTY(EditAnywhere, Blueprintable, Category="Skill Selector")
-	TArray<int32> AvailableSkills;
+	TArray<FSkillStruct> AvailableSkills;
 			
 
 protected:

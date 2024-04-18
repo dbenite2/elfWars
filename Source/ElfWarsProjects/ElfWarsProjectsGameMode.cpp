@@ -18,22 +18,5 @@ void AElfWarsProjectsGameMode::BeginPlay() {
 	Super::BeginPlay();
 	FString ErrorMessage;
 	UGameInstance* GameInstance = GetGameInstance();
-	if (GameInstance)
-	{
-		int32 NewPlayerIndex = GameInstance->GetNumLocalPlayers(); // Get next player index
-		ULocalPlayer* NewLocalPlayer = GameInstance->CreateLocalPlayer(NewPlayerIndex, ErrorMessage, true);
-		if (NewLocalPlayer)
-		{
-			APlayerController* NewPlayerController = Cast<APlayerController>(NewLocalPlayer->GetPlayerController(GetWorld()));
-			if (NewPlayerController)
-			{
-				// Optionally spawn a pawn for this player controller and possess it
-				APawn* NewPawn = SpawnDefaultPawnFor(NewPlayerController, FindPlayerStart(NewPlayerController));
-				if (NewPawn)
-				{
-					NewPlayerController->Possess(NewPawn);
-				}
-			}
-		}
-	}
+	
 }

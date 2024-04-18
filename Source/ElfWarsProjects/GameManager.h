@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "SkillStruct.h"
 #include "GameManager.generated.h"
 
 /**
@@ -16,20 +17,22 @@ class ELFWARSPROJECTS_API UGameManager : public UGameInstance
 
 public:
 	UFUNCTION(CallInEditor, BlueprintCallable)
-	void SetSkillSet(const int PlayerIndex, const int SkillIndex);
+	void SetSkillSet(const int PlayerIndex, const FSkillStruct skill);
 	
 	UFUNCTION(CallInEditor, BlueprintCallable)
-	TArray<int32> GetSkillSet(const int& PlayerIndex);
+	TArray<FSkillStruct> GetSkillSet(const int& PlayerIndex);
 	
 	UFUNCTION(CallInEditor, BlueprintCallable)
 	bool GetSelectionLock(const int PlayerIndex);
 
+	// get character references and pass them to the asking player.
+
 private:
 	UPROPERTY(EditAnywhere, Blueprintable, Category="Skills")
-	TArray<int32> SkillSetP1 {1,2,3,4};
+	TArray<FSkillStruct> SkillSetP1 {{"Kick", 5.f}, {"Hit", 2.5f}, {"Magic_01", 7.5f}, {"Magic_02", 3.f}};
 	
 	UPROPERTY(EditAnywhere, Blueprintable, Category="Skills")
-	TArray<int32> SkillSetP2 {2,4,5,3};
+	TArray<FSkillStruct> SkillSetP2 {{"Kick", 5.f}, {"Hit", 2.5f}, {"Magic_01", 7.5f}, {"Magic_02", 3.f}};
 	
 	UPROPERTY(EditAnywhere, Blueprintable, Category="Selection complete")
 	bool bSelectionLockP1;

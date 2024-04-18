@@ -60,21 +60,21 @@ AElfWarsProjectsCharacter::AElfWarsProjectsCharacter()
 void AElfWarsProjectsCharacter::Tick(float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
 
-	if (AvailableSkills.Contains(1)) {
-		Jump();
-	}
-	if (AvailableSkills.Contains(2)) {
-		Move(100);
-	}
-	if (AvailableSkills.Contains(3)) {
-		Move(-200);
-	}
-	if (AvailableSkills.Contains(4)) {
-		Jump();
-	}
-	if (AvailableSkills.Contains(5)) {
-		Jump();
-	}
+	// if (AvailableSkills.Contains(1)) {
+	// 	Jump();
+	// }
+	// if (AvailableSkills.Contains(2)) {
+	// 	Move(100);
+	// }
+	// if (AvailableSkills.Contains(3)) {
+	// 	Move(-200);
+	// }
+	// if (AvailableSkills.Contains(4)) {
+	// 	Jump();
+	// }
+	// if (AvailableSkills.Contains(5)) {
+	// 	Jump();
+	// }
 }
 
 
@@ -122,14 +122,24 @@ void AElfWarsProjectsCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		
 		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::Move);
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::Look);
+
+
+		// Skills
+		EnhancedInputComponent->BindAction(ExecuteSkill01, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::Skill01);
+
+		EnhancedInputComponent->BindAction(ExecuteSkill02, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::Skill02);
+
+		EnhancedInputComponent->BindAction(ExecuteSkill03, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::Skill03);
+
+		EnhancedInputComponent->BindAction(ExecuteSkill04, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::Skill04);
 	}
 	else
 	{
@@ -170,5 +180,32 @@ void AElfWarsProjectsCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void AElfWarsProjectsCharacter::Skill01() {
+	const FSkillStruct SelectedSkill = AvailableSkills[0];
+	UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 1: %f"), SelectedSkill.Weight)
+}
+
+void AElfWarsProjectsCharacter::Skill02() {
+	const FSkillStruct SelectedSkill = AvailableSkills[1];
+	UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 2: %f"), SelectedSkill.Weight)
+}
+
+void AElfWarsProjectsCharacter::Skill03() {
+	const FSkillStruct SelectedSkill = AvailableSkills[2];
+	UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 3: %f"), SelectedSkill.Weight)
+}
+
+void AElfWarsProjectsCharacter::Skill04() {
+	const FSkillStruct SelectedSkill = AvailableSkills[3];
+	UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 4: %f"), SelectedSkill.Weight)
+}
+
+void AElfWarsProjectsCharacter::Hit(FSkillStruct& Skill) {
+	float DamageReceived = 0.f;
+	if (Type == "Dark") {
+		DamageReceived = Skill.Weight * 2.0f;
 	}
 }
