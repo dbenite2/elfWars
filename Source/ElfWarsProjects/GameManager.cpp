@@ -52,4 +52,23 @@ bool UGameManager::GetSelectionLock(const int PlayerIndex) {
 	return PlayerIndex == 0 ? bSelectionLockP1 : bSelectionLockP2;
 }
 
+void UGameManager::RegisterPlayer(ACharacter* Character) {
+	if (Character) {
+		AvailablePlayers.Add(Character);
+	}
+}
+
+ACharacter* UGameManager::GetPlayer(int32 PlayerIndex) {
+	
+	return AvailablePlayers[PlayerIndex];
+	
+}
+
+void UGameManager::CleanUpRegisteredPlayers() {
+	if (AvailablePlayers.Contains(nullptr)) {
+		AvailablePlayers.RemoveAll([](ACharacter* Obj) {return Obj == nullptr;});
+	}
+}
+
+
 

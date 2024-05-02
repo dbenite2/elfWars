@@ -11,6 +11,8 @@ class AElfWarsProjectsGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
 protected:
 	virtual void BeginPlay() override;
 

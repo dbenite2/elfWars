@@ -59,6 +59,9 @@ class AElfWarsProjectsCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ExecuteSkill04;
 
+	UPROPERTY()
+	AElfWarsProjectsCharacter* OtherPlayer{nullptr};
+
 public:
 	AElfWarsProjectsCharacter();
 
@@ -69,6 +72,9 @@ public:
 
 	UFUNCTION(CallInEditor, Blueprintable)
 	void Hit(FSkillStruct& Skill);
+
+	UFUNCTION(CallInEditor, Blueprintable)
+	void ReceiveDamage(FSkillStruct& Skill);
 
 protected:
 
@@ -88,7 +94,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Blueprintable, Category="Skill Selector")
 	TArray<FSkillStruct> AvailableSkills;
-			
+
+	UPROPERTY(EditAnywhere, Blueprintable, Category="Player Health")
+	float PlayerHealth{100.f};		
 
 protected:
 	// APawn interface

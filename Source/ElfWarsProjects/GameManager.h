@@ -26,6 +26,14 @@ public:
 	bool GetSelectionLock(const int PlayerIndex);
 
 	// get character references and pass them to the asking player.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Players")
+	TArray<ACharacter*> AvailablePlayers;
+	
+	void RegisterPlayer(ACharacter* Character);
+
+	ACharacter* GetPlayer(int32 PlayerIndex);
+
+	void CleanUpRegisteredPlayers();
 
 private:
 	UPROPERTY(EditAnywhere, Blueprintable, Category="Skills")
@@ -39,5 +47,4 @@ private:
 
 	UPROPERTY(EditAnywhere, Blueprintable, Category="Selection complete")
 	bool bSelectionLockP2;
-	
 };
