@@ -13,6 +13,8 @@ class AElfWarsProjectsGameMode : public AGameModeBase
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
+	virtual void StartPlay() override;
+
 protected:
 	virtual void BeginPlay() override;
 

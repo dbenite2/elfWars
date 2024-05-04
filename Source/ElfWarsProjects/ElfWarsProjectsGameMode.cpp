@@ -17,51 +17,39 @@ AElfWarsProjectsGameMode::AElfWarsProjectsGameMode()
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
+		// DefaultPawnClass = nullptr;
 	}
+}
+
+void AElfWarsProjectsGameMode::StartPlay() {
+	Super::StartPlay();
 }
 
 void AElfWarsProjectsGameMode::BeginPlay() {
 	Super::BeginPlay();
 	FString ErrorMessage;
-	UGameInstance* GameInstance = GetGameInstance();
 	UGameManager* GM = Cast<UGameManager>(GetGameInstance());
-	// Assuming you have a PlayerStart class that positions players
 	TArray<AActor*> PlayerStarts;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStarts);
-	FString PlayerCreationError;
-	
 
-	for (int32 i = 0; i < PlayerStarts.Num(); i++)
-	{
+	for (int32 i = 0; i < PlayerStarts.Num(); i++) {
 		// Create a local player and set its controller
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		APlayerController* NewPlayerController = GetWorld()->SpawnActor<APlayerController>(APlayerController::StaticClass(), PlayerStarts[i]->GetTransform(), SpawnParams);
-		ULocalPlayer* LocalPlayer = GM ? GM->CreateLocalPlayer(i, PlayerCreationError, true) : nullptr;
-
-		if (NewPlayerController && LocalPlayer)
-		{
-			NewPlayerController->Player = LocalPlayer;
-
-			// Set up the enhanced input subsystem for this player
-			UEnhancedInputLocalPlayerSubsystem* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
-			if (InputSubsystem)
-			{
-				UInputMappingContext* InputContext = NewObject<UInputMappingContext>(InputSubsystem); // Make sure to create this asset in UE editor
-				InputSubsystem->AddMappingContext(InputContext, 1); // Assuming '1' is the priority
-			}
-
-			// Spawn the character for this player
-			ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->SpawnActor<AElfWarsProjectsCharacter>(AElfWarsProjectsCharacter::StaticClass(), PlayerStarts[i]->GetTransform(), SpawnParams));
-			if (PlayerCharacter)
-			{
-				NewPlayerController->Possess(PlayerCharacter);
-				// GM->RegisterPlayer(PlayerCharacter);
+	
+		if (ULocalPlayer* LocalPlayer = GM ? GM->CreateLocalPlayer(i, ErrorMessage, true) : nullptr) {
+			if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, i)) {
+				PC->Player = LocalPlayer;
+		
+				// Set up the enhanced input subsystem for this player
+				if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+				{
+					UInputMappingContext* InputContext = NewObject<UInputMappingContext>(InputSubsystem);
+					InputSubsystem->AddMappingContext(InputContext, 1); // Assuming '1' is the priority
+				}
 			}
 		}
 	}
-	
 }
 
 void AElfWarsProjectsGameMode::PostLogin(APlayerController* NewPlayer) {
@@ -75,4 +63,5 @@ void AElfWarsProjectsGameMode::PostLogin(APlayerController* NewPlayer) {
 		GM->RegisterPlayer(ControlledCharacter);
 	}
 }
+
 

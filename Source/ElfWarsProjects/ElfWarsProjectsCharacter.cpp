@@ -11,6 +11,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "GameManager.h"
+#include "QTEWidget.h"
+#include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetTree.h"
 #include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -62,22 +65,6 @@ AElfWarsProjectsCharacter::AElfWarsProjectsCharacter()
 
 void AElfWarsProjectsCharacter::Tick(float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
-
-	// if (AvailableSkills.Contains(1)) {
-	// 	Jump();
-	// }
-	// if (AvailableSkills.Contains(2)) {
-	// 	Move(100);
-	// }
-	// if (AvailableSkills.Contains(3)) {
-	// 	Move(-200);
-	// }
-	// if (AvailableSkills.Contains(4)) {
-	// 	Jump();
-	// }
-	// if (AvailableSkills.Contains(5)) {
-	// 	Jump();
-	// }
 }
 
 
@@ -86,37 +73,39 @@ void AElfWarsProjectsCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-	// Get the gameManager info
-	UGameManager* GameManager = Cast<UGameManager>(UGameplayStatics::GetGameInstance(this));
-
-	//Add Input Mapping Context
-	APlayerController* PlayerController = Cast<APlayerController>(Controller);
-	int PlayerIndex = 0;
-	if (PlayerController && GameManager)
-	{
-		PlayerIndex = PlayerController->GetLocalPlayer()->GetLocalPlayerIndex();
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-		OtherPlayer = Cast<AElfWarsProjectsCharacter>(GameManager->GetPlayer(PlayerIndex == 0 ? 1 : 0));
-	}
-
 	// Get the current level of the character
-	FString CurrentLevelName = GetWorld()->GetMapName();
+	CurrentLevelName = GetWorld()->GetMapName();
 	CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
 
 	// Check if the current level name matches the target level name
 	if(CurrentLevelName != FName(TEXT("SkillSelectionLevel"))) {
+
+		if (!PlayerHudTemplate) return;
+
+		// Get the gameManager info
+		UGameManager* GameManager = Cast<UGameManager>(UGameplayStatics::GetGameInstance(this));
+
+		//Add Input Mapping Context
+		APlayerController* PlayerController = Cast<APlayerController>(Controller);
 		// get the skills from the GameManager
-		
-		if (GameManager != nullptr) {
+
+		if (PlayerController && GameManager)
+		{
+			const int PlayerIndex = PlayerController->GetLocalPlayer()->GetLocalPlayerIndex();
+			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+			{
+				Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			}
+			OtherPlayer = Cast<AElfWarsProjectsCharacter>(GameManager->GetPlayer(PlayerIndex == 0 ? 1 : 0));
 			AvailableSkills = GameManager->GetSkillSet(PlayerIndex);
+			PlayerHud = CreateWidget<UUserWidget>(PlayerController, PlayerHudTemplate);
+			PlayerHud->AddToPlayerScreen();
+			QTEWidget = GetQTEWidget(PlayerHud);
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Character is in the target level."));
+		PlayerHealth = MaxPlayerHealth;
+		StartQTE();
 	} 
-	
-	
 	
 }
 
@@ -140,13 +129,13 @@ void AElfWarsProjectsCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 
 
 		// Skills
-		EnhancedInputComponent->BindAction(ExecuteSkill01, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::Skill01);
+		EnhancedInputComponent->BindAction(ExecuteCrossButtonSkill, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::CrossButtonSkill);
 
-		EnhancedInputComponent->BindAction(ExecuteSkill02, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::Skill02);
+		EnhancedInputComponent->BindAction(ExecuteCircleButtonSkill, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::CircleButtonSkill);
 
-		EnhancedInputComponent->BindAction(ExecuteSkill03, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::Skill03);
+		EnhancedInputComponent->BindAction(ExecuteSquareButtonSkill, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::SquareButtonSkill);
 
-		EnhancedInputComponent->BindAction(ExecuteSkill04, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::Skill04);
+		EnhancedInputComponent->BindAction(ExecuteTriangleButtonSkill, ETriggerEvent::Triggered, this, &AElfWarsProjectsCharacter::TriangleButtonSkill);
 	}
 	else
 	{
@@ -190,32 +179,46 @@ void AElfWarsProjectsCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void AElfWarsProjectsCharacter::Skill01() {
+void AElfWarsProjectsCharacter::CrossButtonSkill() {
 	FSkillStruct SelectedSkill = AvailableSkills[0];
-	Hit(SelectedSkill);
-	UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 1: %f"), SelectedSkill.Weight)
+	if (QTEWidget && QTEWidget->IsButtonVisible(QTEWidget->CrossButton)) {
+		Hit(SelectedSkill);
+		UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 1: %f"), SelectedSkill.Weight)
+	}
 }
 
-void AElfWarsProjectsCharacter::Skill02() {
-	const FSkillStruct SelectedSkill = AvailableSkills[1];
-	UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 2: %f"), SelectedSkill.Weight)
+void AElfWarsProjectsCharacter::SquareButtonSkill() {
+	FSkillStruct SelectedSkill = AvailableSkills[1];
+	if (QTEWidget && QTEWidget->IsButtonVisible(QTEWidget->SquareButton)) {
+		Hit(SelectedSkill);
+		UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 2: %f"), SelectedSkill.Weight)
+	}
 }
 
-void AElfWarsProjectsCharacter::Skill03() {
-	const FSkillStruct SelectedSkill = AvailableSkills[2];
-	UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 3: %f"), SelectedSkill.Weight)
+void AElfWarsProjectsCharacter::TriangleButtonSkill() {
+	FSkillStruct SelectedSkill = AvailableSkills[2];
+	if (QTEWidget && QTEWidget->IsButtonVisible(QTEWidget->TriangleButton)) {
+		Hit(SelectedSkill);
+		UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 3: %f"), SelectedSkill.Weight)
+	}
 }
 
-void AElfWarsProjectsCharacter::Skill04() {
-	const FSkillStruct SelectedSkill = AvailableSkills[3];
-	UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 4: %f"), SelectedSkill.Weight)
+void AElfWarsProjectsCharacter::CircleButtonSkill() {
+	FSkillStruct SelectedSkill = AvailableSkills[3];
+	if (QTEWidget && QTEWidget->IsButtonVisible(QTEWidget->CircleButton)) {
+		Hit(SelectedSkill);
+		UE_LOG(LogTemp, Log, TEXT("Doing skill in slot 4: %f"), SelectedSkill.Weight)
+	}
 }
 
 void AElfWarsProjectsCharacter::Hit(FSkillStruct& Skill) {
-	// if same skilltype add 5 to skill damage
+	// if same skill type add 5 to skill damage
+	// Skill.Weight *= 2;
 	if (OtherPlayer) {
 		OtherPlayer->ReceiveDamage(Skill);
 	}
+	QTERepeatInterval -= .2f;
+	EndQTE();
 }
 
 void AElfWarsProjectsCharacter::ReceiveDamage(FSkillStruct& Skill) {
@@ -225,9 +228,46 @@ void AElfWarsProjectsCharacter::ReceiveDamage(FSkillStruct& Skill) {
 	if (Type == "Dark") {
 		DamageReceived = Skill.Weight * 2.0f;
 	}
-	const APawn* Pawn = Controller->GetPawn();
-	const AElfWarsProjectsCharacter* Own = Cast<AElfWarsProjectsCharacter>(Pawn);
-	if (Own != OtherPlayer) {
-		UE_LOG(LogTemp, Log, TEXT("I Took Damage: %f"), Skill.Weight)
+	PlayerHealth -= Skill.Weight;
+	PlayerHealth = FMath::Clamp(PlayerHealth, 0, MaxPlayerHealth);
+	
+	OnHealthModification.Broadcast(PlayerHealth);
+
+	if (PlayerHealth <= 0) {
+		CancelQTE();
+		// switch to skill selection or end game ( should ask game manager for this )
 	}
 }
+
+float AElfWarsProjectsCharacter::GetHealth() const {
+	return PlayerHealth;
+}
+
+float AElfWarsProjectsCharacter::GetHealthPercentage() const {
+	return PlayerHealth / MaxPlayerHealth;
+}
+
+UQTEWidget* AElfWarsProjectsCharacter::GetQTEWidget(UUserWidget* ParentWidget) {
+	if (!ParentWidget) return nullptr;
+	return Cast<UQTEWidget>(ParentWidget->WidgetTree->FindWidget("WBP_QTE"));
+}
+
+void AElfWarsProjectsCharacter::StartQTE() {
+	QTEWidget->ShowRandomButton();
+	// float QTEDuration = 1.5f; // TODO: Change this value to be based on the character type instead of fixed
+	// float QTERepeatInterval = 3.5f;
+	GetWorldTimerManager().SetTimer(QTETimerHandle, this, &AElfWarsProjectsCharacter::EndQTE, QTEDuration, false);
+	GetWorldTimerManager().SetTimer(QTERepeatingHandle, this, &AElfWarsProjectsCharacter::StartQTE, QTERepeatInterval, false);
+}
+
+void AElfWarsProjectsCharacter::EndQTE() const {
+	QTEWidget->HideAllButtons();
+}
+
+void AElfWarsProjectsCharacter::CancelQTE() {
+	GetWorldTimerManager().ClearTimer(QTETimerHandle);
+	GetWorldTimerManager().ClearTimer(QTERepeatingHandle);
+	QTEWidget->HideAllButtons();
+}
+
+

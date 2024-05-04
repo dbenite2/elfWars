@@ -9,7 +9,7 @@ TArray<FSkillStruct> UGameManager::GetSkillSet(const int& PlayerIndex) {
 }
 
 void UGameManager::SetSkillSet(const int PlayerIndex, const FSkillStruct Skill) {
-	UE_LOG(LogTemp, Log, TEXT("Player Index: %d, Skill Index: %s"), PlayerIndex, Skill.Name);
+	UE_LOG(LogTemp, Log, TEXT("Player Index: %d, Skill Index: %f"), PlayerIndex, Skill.Name);
 
 	// Pointer to the current player's skill set
 	TArray<FSkillStruct>* SkillSetPtr = nullptr;
@@ -52,6 +52,14 @@ bool UGameManager::GetSelectionLock(const int PlayerIndex) {
 	return PlayerIndex == 0 ? bSelectionLockP1 : bSelectionLockP2;
 }
 
+bool UGameManager::AllPlayersLockedIn() const {
+	if (AvailablePlayers.Num() == 1) {
+		return bSelectionLockP1;
+	}
+	return bSelectionLockP1 && bSelectionLockP2;	
+}
+
+
 void UGameManager::RegisterPlayer(ACharacter* Character) {
 	if (Character) {
 		AvailablePlayers.Add(Character);
@@ -59,9 +67,7 @@ void UGameManager::RegisterPlayer(ACharacter* Character) {
 }
 
 ACharacter* UGameManager::GetPlayer(int32 PlayerIndex) {
-	
 	return AvailablePlayers[PlayerIndex];
-	
 }
 
 void UGameManager::CleanUpRegisteredPlayers() {

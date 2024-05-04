@@ -25,6 +25,9 @@ public:
 	UFUNCTION(CallInEditor, BlueprintCallable)
 	bool GetSelectionLock(const int PlayerIndex);
 
+	UFUNCTION(CallInEditor, BlueprintCallable)
+	bool AllPlayersLockedIn() const;
+
 	// get character references and pass them to the asking player.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Players")
 	TArray<ACharacter*> AvailablePlayers;
