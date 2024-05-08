@@ -40,7 +40,7 @@ void AElfWarsProjectsGameMode::BeginPlay() {
 		if (ULocalPlayer* LocalPlayer = GM ? GM->CreateLocalPlayer(i, ErrorMessage, true) : nullptr) {
 			if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, i)) {
 				PC->Player = LocalPlayer;
-		
+			
 				// Set up the enhanced input subsystem for this player
 				if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
 				{
@@ -48,6 +48,22 @@ void AElfWarsProjectsGameMode::BeginPlay() {
 					InputSubsystem->AddMappingContext(InputContext, 1); // Assuming '1' is the priority
 				}
 			}
+		}
+	}
+
+	FString CurrentLevelName = GetWorld()->GetMapName();
+	CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+
+	if (CurrentLevelName == FName("SkillSelectionLevel")) {
+		
+		if(UGameViewportClient* ViewportClient = GetWorld()->GetGameViewport()) {
+			ViewportClient->SetForceDisableSplitscreen(false);
+		}
+	}
+	
+	if (CurrentLevelName != FName("SkillSelectionLevel")) {
+		if(UGameViewportClient* ViewportClient = GetWorld()->GetGameViewport()) {
+			ViewportClient->SetForceDisableSplitscreen(true);
 		}
 	}
 }

@@ -83,7 +83,7 @@ void AElfWarsProjectsCharacter::BeginPlay()
 		if (!PlayerHudTemplate) return;
 
 		// Get the gameManager info
-		UGameManager* GameManager = Cast<UGameManager>(UGameplayStatics::GetGameInstance(this));
+		GameManager = Cast<UGameManager>(UGameplayStatics::GetGameInstance(this));
 
 		//Add Input Mapping Context
 		APlayerController* PlayerController = Cast<APlayerController>(Controller);
@@ -217,7 +217,7 @@ void AElfWarsProjectsCharacter::Hit(FSkillStruct& Skill) {
 	if (OtherPlayer) {
 		OtherPlayer->ReceiveDamage(Skill);
 	}
-	QTERepeatInterval -= .2f;
+	QTERepeatInterval -= .02f;
 	EndQTE();
 }
 
@@ -236,6 +236,9 @@ void AElfWarsProjectsCharacter::ReceiveDamage(FSkillStruct& Skill) {
 	if (PlayerHealth <= 0) {
 		CancelQTE();
 		// switch to skill selection or end game ( should ask game manager for this )
+		if(GameManager) {
+			GameManager->EndRound(0);
+		}
 	}
 }
 
@@ -269,5 +272,4 @@ void AElfWarsProjectsCharacter::CancelQTE() {
 	GetWorldTimerManager().ClearTimer(QTERepeatingHandle);
 	QTEWidget->HideAllButtons();
 }
-
 

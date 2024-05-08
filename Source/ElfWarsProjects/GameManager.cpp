@@ -3,6 +3,8 @@
 
 #include "GameManager.h"
 
+#include "Kismet/GameplayStatics.h"
+
 TArray<FSkillStruct> UGameManager::GetSkillSet(const int& PlayerIndex) {
 	UE_LOG(LogTemp, Log, TEXT("PlayerIndex: %d"), PlayerIndex);
 	return PlayerIndex == 0 ? SkillSetP1 : SkillSetP2;
@@ -75,6 +77,28 @@ void UGameManager::CleanUpRegisteredPlayers() {
 		AvailablePlayers.RemoveAll([](ACharacter* Obj) {return Obj == nullptr;});
 	}
 }
+
+void UGameManager::CleanSkillSets() {
+	SkillSetP1.Empty();
+	SkillSetP2.Empty();
+	bSelectionLockP1=false;
+	bSelectionLockP2=false;
+}
+
+void UGameManager::EndRound(const int& PlayerIndex) {
+	GameRounds++;
+	if (GameRounds < 3) {
+		CleanSkillSets();
+		CleanUpRegisteredPlayers();
+		UGameplayStatics::OpenLevel(this, "SkillSelectionLevel");
+	}
+	if (GameRounds == 3) {
+		// TODO: Add game over screen with winner player
+		// UGameplayStatics::OpenLevel(this, "SkillSelectionLevel");
+	}
+}
+
+
 
 
 

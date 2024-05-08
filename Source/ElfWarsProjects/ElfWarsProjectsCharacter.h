@@ -8,6 +8,7 @@
 #include "Logging/LogMacros.h"
 #include "ElfWarsProjectsCharacter.generated.h"
 
+class UGameManager;
 class UQTEWidget;
 struct FSkillStruct;
 class UCSkillSelection;
@@ -140,6 +141,9 @@ protected:
 	void EndQTE() const;
 
 	FString CurrentLevelName;
+
+	UPROPERTY()
+	UGameManager* GameManager{nullptr};
 
 protected:
 	// APawn interface

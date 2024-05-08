@@ -38,6 +38,8 @@ public:
 
 	void CleanUpRegisteredPlayers();
 
+	void EndRound(const int& PlayerIndex);
+
 private:
 	UPROPERTY(EditAnywhere, Blueprintable, Category="Skills")
 	TArray<FSkillStruct> SkillSetP1 {{"Kick", 5.f}, {"Hit", 2.5f}, {"Magic_01", 7.5f}, {"Magic_02", 3.f}};
@@ -50,4 +52,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Blueprintable, Category="Selection complete")
 	bool bSelectionLockP2;
+
+	UPROPERTY()
+	int GameRounds{0};
+
+	void CleanSkillSets();
+	
 };
